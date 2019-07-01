@@ -1,6 +1,0 @@
-step inds tags snps
-catalog080  27737   317389
-mind75  27736   317388
-geno05 26907   264492
-maf05 22836   101932
-hwe05 22764   101146
