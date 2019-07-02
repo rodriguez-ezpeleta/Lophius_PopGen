@@ -1,5 +1,5 @@
 M=2 #small caps
-poploc=/share/projects/GECKA/popmaps/popmap_selectedClean
+poploc=/share/projects/GECKA/popmaps/popmap_selected
 indir=/share/projects/GECKA/stacks_M${M}
 outdir=./
 
@@ -72,12 +72,14 @@ for p in $pops; do
 
 done
 
-# SNPs faling HWE in more than one pop
+##### SNPs faling HWE in more than one pop #####  "STANDARD FILTERING"
 
-cat *_excluded.txt | sort | uniq -d > SNPs_failMoreThanOnePop.txt
+head -5 standard_filtering/population_stats.txt > population_stats.txt
+
+cat *_excluded.txt | sort  |uniq -c | sort -g | grep "8 " > SNPs_failAllPops.txt
 
 #remove snps not passing hwe 0.05 in more than one pop
-plink --noweb --file  populations.plink_mind75_geno05_maf05 --exclude SNPs_failMoreThanOnePop.txt --out populations.plink_mind75_geno05_maf05_hwe05 --recode
+plink --noweb --file  perArea.plink_mind75_geno05_maf05 --exclude SNPs_failMoreThanOnePop.txt --out populations.plink_mind75_geno05_maf05_hwe05 --recode
 
 #count missing data for inds and snps
 plink --noweb --file  populations.plink_mind75_geno05_maf05_hwe05 --out populations.plink_mind75_geno05_maf05_hwe05  --missing --allow-no-sex
@@ -98,3 +100,43 @@ populations -P $indir -M $poploc -O $outdir --write-single-snp --whitelist  SNPs
 
 rename s/populations/perArea_oneSNP/g *
 
+shuf SNPs_mind75_geno05_maf05_hwe05.txt | head -5000 > SNPs_mind75_geno05_maf05_hwe05_5k.txt
+
+populations -P $indir -M $poploc -O $outdir --write-single-snp --whitelist  SNPs_mind75_geno05_maf05_hwe05_5k.txt --genepop --structure --plink  
+
+rename s/populations/perArea_oneSNP/g *
+
+
+mkdir standard_filtering
+
+mv population_stats.txt SNPs_failMoreThanOnePop.txt SNPs_mind75_geno05_maf05_hwe05.txt perArea* standard_filtering
+
+##### SNPs faling HWE all populations ##### "LooseHWE"
+
+cat *_excluded.txt | sort | uniq -d > SNPs_failMoreThanOnePop.txt
+
+#remove snps not passing hwe 0.05 in more than one pop
+plink --noweb --file  standard_filtering/populations.plink_mind75_geno05_maf05 --exclude SNPs_failAllPops.txt --out populations.plink_mind75_geno05_maf05_hwe05 --recode
+
+#count missing data for inds and snps
+plink --noweb --file  populations.plink_mind75_geno05_maf05_hwe05 --out populations.plink_mind75_geno05_maf05_hwe05  --missing --allow-no-sex
+tr -s ' ' < populations.plink_mind75_geno05_maf05_hwe05.imiss | cut -d " " -f 7 | sort -g | tail -n 10
+tr -s ' ' < populations.plink_mind75_geno05_maf05_hwe05.lmiss | cut -d " " -f 6 | sort -g | tail -n 10
+
+tags="$(cut -f 2 populations.plink_mind75_geno05_maf05_hwe05.map| cut -d "_" -f 1 | uniq|wc -l | cut -d " " -f 1)"
+snps="$(wc -l populations.plink_mind75_geno05_maf05_hwe05.map| cut -d " " -f 1)"
+echo "hwe05"  $tags " " $snps  >> population_stats.txt
+
+cut -f 2 populations.plink_mind75_geno05_maf05_hwe05.map | sed -e s/"_"/"\t"/g > SNPs_mind75_geno05_maf05_hwe05.txt
+
+populations -P $indir -M $poploc -O $outdir  --whitelist  SNPs_mind75_geno05_maf05_hwe05.txt --genepop --structure --plink  
+
+rename s/populations/perAreaLooseHWE/g *
+
+populations -P $indir -M $poploc -O $outdir --write-single-snp --whitelist  SNPs_mind75_geno05_maf05_hwe05.txt --genepop --structure --plink  
+
+rename s/populations/perAreaLooseHWE_oneSNP/g *
+
+mkdir looseHWE
+
+mv population_stats.txt SNPs_failAllPops.txt SNPs_mind75_geno05_maf05_hwe05.txt *LooseHWE* looseHWE
