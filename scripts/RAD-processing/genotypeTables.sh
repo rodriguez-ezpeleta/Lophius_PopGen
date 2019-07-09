@@ -7,136 +7,128 @@ pops="$(cut -f 2 ${poploc} | sort | uniq)"
 
 p="$(cut -f 2 ${poploc} | sort | uniq | wc -l)"
 
-populations -P $indir -M $poploc -O $outdir -p ${p} -t 8 -r 0.80 -R 0.80 --plink
+populations -P $indir -M $poploc -O $outdir -p ${p} -R 0.90 --plink
 
-echo "step inds tags snps" > population_stats.txt
+rename s/populations/R90/g *
+
+cut -f 2 R90.plink.map | awk -F _ '$2 < 100' > R90_100bp.txt
+#cut -f 2 R90.plink.map | sed -e s/"_"/"\t"/g | awk  '$2 < 100' > R90_100bp.txt
+
+plink --noweb --file  R90.plink --out R90_100bp.plink  --extract R90_100bp.txt --allow-no-sex --recode
+
+echo "step inds inds100bp tags tags100bp snps snps100bp" > population_stats.txt
 
 # count missing data for inds and snps
-plink --noweb --file  populations.plink --out populations.plink  --missing --allow-no-sex
-tr -s ' ' < populations.plink.imiss | cut -d " " -f 7 | sort -g | tail -n 10
-tr -s ' ' < populations.plink.lmiss | cut -d " " -f 6 | sort -g | tail -n 10
+plink --noweb --file  R90.plink --out R90.plink  --missing --allow-no-sex
+plink --noweb --file  R90_100bp.plink --out R90_100bp.plink  --missing --allow-no-sex
 
-tags="$(cut -f 2 populations.plink.map| cut -d "_" -f 1 | uniq|wc -l | cut -d " " -f 1)"
-snps="$(wc -l populations.plink.map| cut -d " " -f 1)"
-echo "catalog080 "  $tags " " $snps  >> population_stats.txt
+inds="$(grep -v "#" R90.plink.ped | wc -l | cut -d " " -f 1)"
+inds100="$(wc -l R90_100bp.plink.ped | cut -d " " -f 1)"
+tags="$(grep -v "#"  R90.plink.map|cut -f 2| cut -d "_" -f 1 | uniq|wc -l | cut -d " " -f 1)"
+tags100="$(cut -f 2 R90_100bp.plink.map| cut -d "_" -f 1 | uniq|wc -l | cut -d " " -f 1)"
+snps="$(cut -f 2 R90.plink.map|wc -l | cut -d " " -f 1)"
+snps100="$(wc -l R90_100bp.plink.map| cut -d " " -f 1)"
+echo "catalog090 " $inds " " $inds100 "" $tags " " $tags100 " " $snps  " " $snps100  >> population_stats.txt
 
 #remove inds with more than 0.25 missing data
-plink --noweb --file populations.plink  --mind 0.25 --out populations.plink_mind75 --recode --allow-no-sex
+plink --noweb --file R90.plink  --mind 0.25 --out R90.plink_mind75 --recode --allow-no-sex
+plink --noweb --file R90_100bp.plink  --mind 0.25 --out R90_100bp.plink_mind75 --recode --allow-no-sex
 
 #count missing data for inds and snps
-plink --noweb --file  populations.plink_mind75 --out populations.plink_mind75  --missing --allow-no-sex
-tr -s ' ' < populations.plink_mind75.imiss | cut -d " " -f 7 | sort -g | tail -n 10
-tr -s ' ' < populations.plink_mind75.lmiss | cut -d " " -f 6 | sort -g | tail -n 10
+plink --noweb --file  R90.plink_mind75 --out R90.plink_mind75  --missing --allow-no-sex
+plink --noweb --file  R90_100bp.plink_mind75 --out R90_100bp.plink_mind75  --missing --allow-no-sex
 
-tags="$(cut -f 2 populations.plink_mind75.map| cut -d "_" -f 1 | uniq|wc -l | cut -d " " -f 1)"
-snps="$(wc -l populations.plink_mind75.map| cut -d " " -f 1)"
-echo "mind75 "  $tags " " $snps  >> population_stats.txt
+inds="$(grep -v "#" R90.plink_mind75.ped | wc -l | cut -d " " -f 1)"
+inds100="$(wc -l R90_100bp.plink_mind75.ped | cut -d " " -f 1)"
+tags="$(grep -v "#"  R90.plink_mind75.map|cut -f 2| cut -d "_" -f 1 | uniq|wc -l | cut -d " " -f 1)"
+tags100="$(cut -f 2 R90_100bp.plink_mind75.map| cut -d "_" -f 1 | uniq|wc -l | cut -d " " -f 1)"
+snps="$(cut -f 2 R90.plink_mind75.map|wc -l | cut -d " " -f 1)"
+snps100="$(wc -l R90_100bp.plink_mind75.map| cut -d " " -f 1)"
+echo "mind075 " $inds " " $inds100 "" $tags " " $tags100 " " $snps  " " $snps100  >> population_stats.txt
+
 
 #remove snps with more than 0.05 missing data
-plink --noweb --file populations.plink_mind75  --geno 0.05 --out populations.plink_mind75_geno05 --recode --allow-no-sex
+plink --noweb --file R90.plink_mind75  --geno 0.05 --out R90.plink_mind75_geno05 --recode --allow-no-sex
+plink --noweb --file R90_100bp.plink_mind75  --geno 0.05 --out R90_100bp.plink_mind75_geno05 --recode --allow-no-sex
 
 #count missing data for inds and snps
-plink --noweb --file  populations.plink_mind75_geno05 --out populations.plink_mind75_geno05  --missing --allow-no-sex
-tr -s ' ' < populations.plink_mind75_geno05.imiss | cut -d " " -f 7 | sort -g | tail -n 10
-tr -s ' ' < populations.plink_mind75_geno05.lmiss | cut -d " " -f 6 | sort -g | tail -n 10
+plink --noweb --file  R90.plink_mind75_geno05 --out R90.plink_mind75_geno05  --missing --allow-no-sex
+plink --noweb --file  R90_100bp.plink_mind75_geno05 --out R90_100bp.plink_mind75_geno05  --missing --allow-no-sex
 
-tags="$(cut -f 2 populations.plink_mind75_geno05.map| cut -d "_" -f 1 | uniq|wc -l | cut -d " " -f 1)"
-snps="$(wc -l populations.plink_mind75_geno05.map| cut -d " " -f 1)"
-echo "geno05"  $tags " " $snps  >> population_stats.txt
+inds="$(grep -v "#" R90.plink_mind75_geno05.ped | wc -l | cut -d " " -f 1)"
+inds100="$(wc -l R90_100bp.plink_mind75_geno05.ped | cut -d " " -f 1)"
+tags="$(grep -v "#"  R90.plink_mind75_geno05.map|cut -f 2| cut -d "_" -f 1 | uniq|wc -l | cut -d " " -f 1)"
+tags100="$(cut -f 2 R90_100bp.plink_mind75_geno05.map| cut -d "_" -f 1 | uniq|wc -l | cut -d " " -f 1)"
+snps="$(cut -f 2 R90.plink_mind75_geno05.map|wc -l | cut -d " " -f 1)"
+snps100="$(wc -l R90_100bp.plink_mind75_geno05.map| cut -d " " -f 1)"
+echo "geno05 " $inds " " $inds100 "" $tags " " $tags100 " " $snps  " " $snps100  >> population_stats.txt
 
 #remove snps with less than 0.05 maf data
-plink --noweb --file  populations.plink_mind75_geno05 --maf 0.05 --out populations.plink_mind75_geno05_maf05 --recode
+plink --noweb --file  R90.plink_mind75_geno05 --maf 0.05 --out R90.plink_mind75_geno05_maf05 --recode
+plink --noweb --file  R90_100bp.plink_mind75_geno05 --maf 0.05 --out R90_100bp.plink_mind75_geno05_maf05 --recode
 
 #count missing data for inds and snps
-plink --noweb --file  populations.plink_mind75_geno05_maf05 --out populations.plink_mind75_geno05_maf05  --missing --allow-no-sex
-tr -s ' ' < populations.plink_mind75_geno05_maf05.imiss | cut -d " " -f 7 | sort -g | tail -n 10
-tr -s ' ' < populations.plink_mind75_geno05_maf05.lmiss | cut -d " " -f 6 | sort -g | tail -n 10
+plink --noweb --file  R90.plink_mind75_geno05_maf05 --out R90.plink_mind75_geno05_maf05  --missing --allow-no-sex
+plink --noweb --file  R90_100bp.plink_mind75_geno05_maf05 --out R90_100bp.plink_mind75_geno05_maf05  --missing --allow-no-sex
 
-tags="$(cut -f 2 populations.plink_mind75_geno05_maf05.map| cut -d "_" -f 1 | uniq|wc -l | cut -d " " -f 1)"
-snps="$(wc -l populations.plink_mind75_geno05_maf05.map| cut -d " " -f 1)"
-echo "maf05"  $tags " " $snps  >> population_stats.txt
+inds="$(grep -v "#" R90.plink_mind75_geno05_maf05.ped | wc -l | cut -d " " -f 1)"
+inds100="$(wc -l R90_100bp.plink_mind75_geno05_maf05.ped | cut -d " " -f 1)"
+tags="$(grep -v "#"  R90.plink_mind75_geno05_maf05.map|cut -f 2| cut -d "_" -f 1 | uniq|wc -l | cut -d " " -f 1)"
+tags100="$(cut -f 2 R90_100bp.plink_mind75_geno05_maf05.map| cut -d "_" -f 1 | uniq|wc -l | cut -d " " -f 1)"
+snps="$(cut -f 2 R90.plink_mind75_geno05_maf05.map|wc -l | cut -d " " -f 1)"
+snps100="$(wc -l R90_100bp.plink_mind75_geno05_maf05.map| cut -d " " -f 1)"
+echo "maf05 " $inds " " $inds100 "" $tags " " $tags100 " " $snps  " " $snps100  >> population_stats.txt
 
 
 rm -f SNPs.txt
 rm -rf nbSNPsexcluded.txt
 
+echo "pop" "HWEexcluded" "HWEexcluded-100bp" > nbSNPsexcluded.txt
+
 for p in $pops; do
 
-        grep $p populations.plink_mind75_geno05_maf05.ped > ${p}.ped
-        cp populations.plink_mind75_geno05_maf05.map ${p}.map
+        awk -v p="$p" '($1 == p)' R90.plink_mind75_geno05_maf05.ped > ${p}.ped
+        awk -v p="$p" '($1 == p)' R90_100bp.plink_mind75_geno05_maf05.ped > ${p}_100bp.ped
+        cp R90.plink_mind75_geno05_maf05.map ${p}.map
+        cp R90_100bp.plink_mind75_geno05_maf05.map ${p}_100bp.map
         plink --noweb --file ${p} --hwe 0.05 --out ${p}_hwe05 --recode  
-        exc="$(grep "markers to be excluded based" ${p}_hwe05.log | cut -d " " -f 1)"
-        echo $p " " $exc >> nbSNPsexcluded.txt
-        cat ${p}_hwe05.map  populations.plink_mind75_geno05_maf05.map | sort | uniq -u | sed 's/ \+/\t/g' | cut -f 2 > ${p}_excluded.txt
-        rm -rf ${p}.ped ${p}.map ${p}_hwe05.*
+        plink --noweb --file ${p}_100bp --hwe 0.05 --out ${p}_100bp_hwe05 --recode  
+        cat ${p}_hwe05.map  R90.plink_mind75_geno05_maf05.map | sort | uniq -u | sed 's/ \+/\t/g' | cut -f 2 > ${p}_excluded.txt
+        cat ${p}_100bp_hwe05.map  R90_100bp.plink_mind75_geno05_maf05.map | sort | uniq -u | sed 's/ \+/\t/g' | cut -f 2 > ${p}_100bp_excluded.txt
+        exc="$(wc -l ${p}_excluded.txt | cut -d " " -f 1)"
+        exc100="$(wc -l ${p}_100bp_excluded.txt | cut -d " " -f 1)"
+        echo $p $exc $exc100 >> nbSNPsexcluded.txt
+        rm -rf ${p}.ped ${p}.map ${p}_hwe05.* ${p}_100bp.ped ${p}_100bp.map ${p}_100bp_hwe05.*
 
 done
 
-##### SNPs faling HWE in more than one pop #####  "STANDARD FILTERING"
+cut -d " " -f 2 R90.plink_mind75_geno05_maf05.ped > s
+cut -d " " -f 1 R90.plink_mind75_geno05_maf05.ped > p
+paste s p > popmap_mind75
+rm -rf s p
 
-head -5 standard_filtering/population_stats.txt > population_stats.txt
+cut -d " " -f 2 R90_100bp.plink_mind75_geno05_maf05.ped > s
+cut -d " " -f 1 R90_100bp.plink_mind75_geno05_maf05.ped > p
+paste s p > popmap_100bp_mind75
+rm -rf s p
 
-cat *_excluded.txt | sort  |uniq -c | sort -g | grep "8 " > SNPs_failAllPops.txt
+cut -f 2 R90.plink_mind75_geno05_maf05.map | sed -E s/"_"/"\t"/g >R90.plink_mind75_geno05_maf05.txt
+cut -f 2 R90_100bp.plink_mind75_geno05_maf05.map | sed -E s/"_"/"\t"/g > R90_100bp.plink_mind75_geno05_maf05.txt
 
-#remove snps not passing hwe 0.05 in more than one pop
-plink --noweb --file  perArea.plink_mind75_geno05_maf05 --exclude SNPs_failMoreThanOnePop.txt --out populations.plink_mind75_geno05_maf05_hwe05 --recode
+populations -P $indir -M popmap_100bp_mind75 -O $outdir  --whitelist R90_100bp.plink_mind75_geno05_maf05.txt --genepop --structure --plink 
 
-#count missing data for inds and snps
-plink --noweb --file  populations.plink_mind75_geno05_maf05_hwe05 --out populations.plink_mind75_geno05_maf05_hwe05  --missing --allow-no-sex
-tr -s ' ' < populations.plink_mind75_geno05_maf05_hwe05.imiss | cut -d " " -f 7 | sort -g | tail -n 10
-tr -s ' ' < populations.plink_mind75_geno05_maf05_hwe05.lmiss | cut -d " " -f 6 | sort -g | tail -n 10
+rename s/populations//g *
 
-tags="$(cut -f 2 populations.plink_mind75_geno05_maf05_hwe05.map| cut -d "_" -f 1 | uniq|wc -l | cut -d " " -f 1)"
-snps="$(wc -l populations.plink_mind75_geno05_maf05_hwe05.map| cut -d " " -f 1)"
-echo "hwe05"  $tags " " $snps  >> population_stats.txt
+plink --noweb --file  SNPs_100bp --out SNPs_100bp  --missing --allow-no-sex
+tr -s ' ' < SNPs_100bp.imiss | cut -d " " -f 7 | sort -g | tail -n 10
+tr -s ' ' < SNPs_100bp.lmiss | cut -d " " -f 6 | sort -g | tail -n 10
 
-cut -f 2 populations.plink_mind75_geno05_maf05_hwe05.map | sed -e s/"_"/"\t"/g > SNPs_mind75_geno05_maf05_hwe05.txt
+populations -P $indir -M $poploc -O $outdir  --write-single-snp --whitelist  SNPs_mind75_geno05_maf05_100bp.txt --genepop --structure --plink  
 
-populations -P $indir -M $poploc -O $outdir  --whitelist  SNPs_mind75_geno05_maf05_hwe05.txt --genepop --structure --plink  
+rename s/populations/SNPs_100bp_oneSNP/g *
 
-rename s/populations/perArea/g *
+shuf SNPs_mind75_geno05_maf05_100bp.txt | head -2000 > SNPs_mind75_geno05_maf05_100bp_2k.txt
 
-populations -P $indir -M $poploc -O $outdir --write-single-snp --whitelist  SNPs_mind75_geno05_maf05_hwe05.txt --genepop --structure --plink  
+populations -P $indir -M $poploc -O $outdir  --write-single-snp --whitelist  SNPs_mind75_geno05_maf05_100bp_2k.txt --genepop --structure --plink  
 
-rename s/populations/perArea_oneSNP/g *
-
-shuf SNPs_mind75_geno05_maf05_hwe05.txt | head -5000 > SNPs_mind75_geno05_maf05_hwe05_5k.txt
-
-populations -P $indir -M $poploc -O $outdir --write-single-snp --whitelist  SNPs_mind75_geno05_maf05_hwe05_5k.txt --genepop --structure --plink  
-
-rename s/populations/perArea_oneSNP/g *
-
-
-mkdir standard_filtering
-
-mv population_stats.txt SNPs_failMoreThanOnePop.txt SNPs_mind75_geno05_maf05_hwe05.txt perArea* standard_filtering
-
-##### SNPs faling HWE all populations ##### "LooseHWE"
-
-cat *_excluded.txt | sort | uniq -d > SNPs_failMoreThanOnePop.txt
-
-#remove snps not passing hwe 0.05 in more than one pop
-plink --noweb --file  standard_filtering/populations.plink_mind75_geno05_maf05 --exclude SNPs_failAllPops.txt --out populations.plink_mind75_geno05_maf05_hwe05 --recode
-
-#count missing data for inds and snps
-plink --noweb --file  populations.plink_mind75_geno05_maf05_hwe05 --out populations.plink_mind75_geno05_maf05_hwe05  --missing --allow-no-sex
-tr -s ' ' < populations.plink_mind75_geno05_maf05_hwe05.imiss | cut -d " " -f 7 | sort -g | tail -n 10
-tr -s ' ' < populations.plink_mind75_geno05_maf05_hwe05.lmiss | cut -d " " -f 6 | sort -g | tail -n 10
-
-tags="$(cut -f 2 populations.plink_mind75_geno05_maf05_hwe05.map| cut -d "_" -f 1 | uniq|wc -l | cut -d " " -f 1)"
-snps="$(wc -l populations.plink_mind75_geno05_maf05_hwe05.map| cut -d " " -f 1)"
-echo "hwe05"  $tags " " $snps  >> population_stats.txt
-
-cut -f 2 populations.plink_mind75_geno05_maf05_hwe05.map | sed -e s/"_"/"\t"/g > SNPs_mind75_geno05_maf05_hwe05.txt
-
-populations -P $indir -M $poploc -O $outdir  --whitelist  SNPs_mind75_geno05_maf05_hwe05.txt --genepop --structure --plink  
-
-rename s/populations/perAreaLooseHWE/g *
-
-populations -P $indir -M $poploc -O $outdir --write-single-snp --whitelist  SNPs_mind75_geno05_maf05_hwe05.txt --genepop --structure --plink  
-
-rename s/populations/perAreaLooseHWE_oneSNP/g *
-
-mkdir looseHWE
-
-mv population_stats.txt SNPs_failAllPops.txt SNPs_mind75_geno05_maf05_hwe05.txt *LooseHWE* looseHWE
+rename s/populations/SNPs_100bp_oneSNP_2k/g *
