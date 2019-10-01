@@ -1,0 +1,149 @@
+# Note: Individual distributions can be extracted using the `stacks-dist-extract` utility.
+#       e.g. `stacks-dist-extract populations.log.distribs dist_name`
+
+BEGIN batch_progress
+Batch 1: analyzed 1894 loci; filtered 527862 loci; 529756 loci seen.
+END batch_progress
+
+BEGIN samples_per_loc_prefilters
+# Distribution of valid samples matched to a catalog locus prior to filtering.
+n_samples	n_loci
+266	7
+267	26
+268	37
+269	45
+270	45
+271	57
+272	93
+273	116
+274	154
+275	224
+276	232
+277	290
+278	256
+279	211
+280	101
+END samples_per_loc_prefilters
+
+BEGIN missing_samples_per_loc_prefilters
+# Distribution of missing samples for each catalog locus prior to filtering.
+# Absent samples at locus	Count
+0	101
+1	211
+2	256
+3	290
+4	232
+5	224
+6	154
+7	116
+8	93
+9	57
+10	45
+11	45
+12	37
+13	26
+14	7
+END missing_samples_per_loc_prefilters
+
+BEGIN snps_per_loc_prefilters
+# Distribution of the number of SNPs per catalog locus prior to filtering.
+n_snps	n_loci
+5	2
+6	1
+7	5
+8	6
+9	9
+10	10
+11	17
+12	21
+13	21
+14	27
+15	38
+16	58
+17	63
+18	73
+19	78
+20	80
+21	90
+22	92
+23	86
+24	94
+25	89
+26	92
+27	84
+28	82
+29	66
+30	65
+31	76
+32	61
+33	54
+34	42
+35	55
+36	46
+37	34
+38	27
+39	26
+40	23
+41	12
+42	24
+43	6
+44	10
+45	12
+46	7
+47	5
+48	3
+49	3
+50	6
+51	1
+52	6
+53	1
+54	1
+56	3
+62	1
+END snps_per_loc_prefilters
+
+BEGIN samples_per_loc_postfilters
+# Distribution of valid samples matched to a catalog locus after filtering.
+n_samples	n_loci
+266	7
+267	26
+268	37
+269	45
+270	45
+271	57
+272	93
+273	116
+274	154
+275	224
+276	232
+277	290
+278	256
+279	211
+280	101
+END samples_per_loc_postfilters
+
+BEGIN missing_samples_per_loc_postfilters
+# Distribution of missing samples for each catalog locus after filtering.
+# Absent samples at locus	Count
+0	101
+1	211
+2	256
+3	290
+4	232
+5	224
+6	154
+7	116
+8	93
+9	57
+10	45
+11	45
+12	37
+13	26
+14	7
+END missing_samples_per_loc_postfilters
+
+BEGIN snps_per_loc_postfilters
+# Distribution of the number of SNPs per catalog locus (after filtering).
+n_snps	n_loci
+1	1894
+END snps_per_loc_postfilters
