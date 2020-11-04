@@ -1,4 +1,4 @@
-# change for each project
+
 clean=/share/projects/GECKA/clean # folder where clean files R1 and R2 are located
 M=4 # M parameter; to change if needed
 n=6 # n parameter; to change if needed
@@ -73,4 +73,4 @@ tsv2bam -P $out -M ../popmaps/popmapPreCstacks --pe-reads-dir $clean -t 8
 
 ## gstacks
 
-gstacks -P $out -M ../popmaps/popmapPreCstacks -t 8
+gstacks -P $out -M ../popmaps/popmapPreCstacks -t 8 --ignore-pe-reads

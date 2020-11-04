@@ -9,12 +9,15 @@ genotype_tablesHWrape_mind*.sh -> from catalog to genotype files (missing less t
 
 GENOTYPE DATA
 
-The first .str is composed by ALL individuals 
-The second one by ALL individuals mapped to a reference genome of L.pis
-The third one is the only LPIS real individuals without black or hybrids AND including MED
-The fourth one is composed by only L.pis individuals in the Atlantic
+ALL_R90_mind85_geno05_maf05_100bp_oneSNP.str is composed by ALL individuals 
 
+ALL_REFERENCE_R90_mind85_geno05_maf05_100bp_oneSNP.str by ALL individuals mapped to a reference genome of L.pis
 
+LPIS_ATLANTIC_MED_R90_mind85_geno05_maf05_100bp_oneSNP.stris the only LPIS real individuals without black or hybrids AND including MED
+
+LPIS_ATLANTIC_R90_mind85_geno05_maf05_100bp_oneSNP.str is composed by only L.pis individuals in the Atlantic
+
+*mind 75 or 85 could be used
 --------------------------
 OLD
 
